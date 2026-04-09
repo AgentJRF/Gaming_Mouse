@@ -135,7 +135,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xe8e8e8);
 
 const camera = new THREE.PerspectiveCamera(45, W()/H(), 0.01, 100);
-camera.position.set(0, 0.15, 0.8);
+camera.position.set(0, 0.12, 0.55);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -169,19 +169,23 @@ scene.add(rimLight);
 const mirrorGeometry = new THREE.PlaneGeometry(4, 4);
 const mirror = new THREE.Reflector(mirrorGeometry, {
   clipBias: 0.003,
-  textureWidth: 1024,
-  textureHeight: 1024,
-  color: 0xc0c0c0,
+  textureWidth: 512,
+  textureHeight: 512,
+  color: 0xdddddd,
+  opacity: 0.3,
 });
 mirror.rotation.x = -Math.PI / 2;
 mirror.position.y = -0.001;
+mirror.material.transparent = true;
+mirror.material.opacity = 0.25;
 scene.add(mirror);
 
-// Floor shadow receiver
+// Floor shadow receiver — invisible, juste pour les ombres
 const floorGeo = new THREE.PlaneGeometry(4, 4);
-const floorMat = new THREE.ShadowMaterial({ opacity: 0.15 });
+const floorMat = new THREE.ShadowMaterial({ opacity: 0.12, transparent: true });
 const floor = new THREE.Mesh(floorGeo, floorMat);
 floor.rotation.x = -Math.PI / 2;
+floor.position.y = -0.002;
 floor.receiveShadow = true;
 scene.add(floor);
 
@@ -285,7 +289,7 @@ function animate() {
   requestAnimationFrame(animate);
   controls.update();
   if (autoRotate && currentModel) {
-    angle += 0.005;
+    angle += 0.015;
     currentModel.rotation.y = angle;
   }
   renderer.render(scene, camera);
