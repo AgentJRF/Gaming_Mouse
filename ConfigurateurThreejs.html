@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurateur Souris Gaming</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #f5f5f3; color: #1a1a1a; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+header { padding: 12px 20px; border-bottom: 0.5px solid #ddd; background: #fff; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+header h1 { font-size: 14px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+.status { font-size: 11px; color: #888; }
+.main { display: grid; grid-template-columns: 1fr 300px; flex: 1; overflow: hidden; }
+#viewer { background: #e8e8e8; position: relative; overflow: hidden; }
+#viewer canvas { display: block; }
+.panel { background: #fff; border-left: 0.5px solid #e0e0e0; overflow-y: auto; display: flex; flex-direction: column; }
+.section { padding: 16px; border-bottom: 0.5px solid #f0f0f0; }
+.section-label { font-size: 10px; font-weight: 500; color: #999; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.accent-bar { height: 3px; border-radius: 2px; margin-bottom: 10px; transition: background 0.3s; }
+.model-tabs { display: flex; flex-direction: column; gap: 5px; }
+.model-tab { padding: 7px 12px; font-size: 12px; border: 0.5px solid #ddd; border-radius: 6px; background: transparent; color: #666; cursor: pointer; text-align: left; transition: all 0.15s; }
+.model-tab:hover { background: #f5f5f3; }
+.model-tab.active { background: #f9f9f7; font-weight: 500; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 0.5px solid #f0f0f0; }
+.info-label { font-size: 11px; color: #999; }
+.info-val { font-size: 12px; font-weight: 500; color: #1a1a1a; text-align: right; max-width: 160px; }
+.finish-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+.finish-btn { padding: 5px 10px; font-size: 11px; border: 0.5px solid #ddd; border-radius: 6px; background: transparent; color: #666; cursor: pointer; transition: all 0.15s; }
+.finish-btn:hover { background: #f5f5f3; }
+.finish-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.summary { padding: 14px 16px; background: #f9f9f7; border-top: 0.5px solid #eee; }
+.sum-row { display: flex; justify-content: space-between; font-size: 11px; color: #888; padding: 3px 0; }
+.sum-val { color: #1a1a1a; font-weight: 500; }
+.cta-wrap { padding: 14px 16px; }
+.cta { width: 100%; padding: 10px; font-size: 13px; font-weight: 500; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+.cta:hover { opacity: 0.8; }
+.hint { font-size: 10px; color: #aaa; text-align: center; margin-top: 6px; }
+#loading-overlay { position: absolute; inset: 0; background: #e8e8e8; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; z-index: 10; }
+.spinner { width: 32px; height: 32px; border: 2px solid #ccc; border-top-color: #666; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading-overlay p { font-size: 12px; color: #888; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Gaming Mouse — Configurateur</h1>
+  <span class="status" id="statusText">Chargement...</span>
+</header>
+
+<div class="main">
+  <div id="viewer">
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+      <p>Chargement du modèle 3D...</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="section">
+      <div class="section-label">Modèle</div>
+      <div class="accent-bar" id="accentBar"></div>
+      <div class="model-tabs" id="modelTabs"></div>
+    </div>
+    <div class="section">
+      <div class="section-label">Finitions incluses</div>
+      <div class="info-row"><span class="info-label">Couleur principale</span><span class="info-val" id="infoColor">—</span></div>
+      <div class="info-row"><span class="info-label">Couleur secondaire</span><span class="info-val" id="infoColor2">—</span></div>
+      <div class="info-row"><span class="info-label">Grip</span><span class="info-val" id="infoGrip">—</span></div>
+      <div class="info-row"><span class="info-label">Molette</span><span class="info-val" id="infoWheel">—</span></div>
+    </div>
+    <div class="section">
+      <div class="section-label">Rétroéclairage LED</div>
+      <div class="finish-btns" id="ledBtns"></div>
+    </div>
+    <div class="summary">
+      <div class="sum-row"><span>Modèle</span><span class="sum-val" id="s-model">—</span></div>
+      <div class="sum-row"><span>Couleur</span><span class="sum-val" id="s-color">—</span></div>
+      <div class="sum-row"><span>Grip</span><span class="sum-val" id="s-grip">—</span></div>
+      <div class="sum-row"><span>Molette</span><span class="sum-val" id="s-wheel">—</span></div>
+      <div class="sum-row"><span>LED</span><span class="sum-val" id="s-led">—</span></div>
+    </div>
+    <div class="cta-wrap">
+      <button class="cta" id="ctaBtn">Valider ma configuration</button>
+      <p class="hint">← Glisser pour faire tourner le modèle</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Reflector.js"></script>
+
+<script>
+const BASE_URL = "https://agentjrf.github.io/Gaming_Mouse/";
+
+const MODELS = {
+  arctic:   { name: "Arctic Blue",      glb: "GM_Green-v1.glb",          useOriginal: false, accent: "#2a6db5", color: "Bleu métallique", color2: "Bleu glacier",  grip: "Perforé croix",       wheel: "Métal bleu",              defaultLed: null,  bodyHex: "#2a6db5", clicHex: "#a8d4f5", wheelHex: "#1a4a8a", bodyMetal: 0.6,  bodyRough: 0.3,  gripMetal: 0.15, gripRough: 0.6,  wheelMetal: 0.85, wheelRough: 0.2  },
+  retro:    { name: "Retro Tech White",  glb: "GM_Green-v1.glb",          useOriginal: false, accent: "#e07b2a", color: "Blanc & Orange",  color2: "Gris Tech",     grip: "Pattern topologique", wheel: "Métal orange",            defaultLed: null,  bodyHex: "#f0ede8", clicHex: "#9a9a9a", wheelHex: "#c45c1a", bodyMetal: 0.05, bodyRough: 0.7,  gripMetal: 0.0,  gripRough: 0.75, wheelMetal: 0.8,  wheelRough: 0.25 },
+  jungle:   { name: "Jungle Green",      glb: "GM_Green-v1.glb",          useOriginal: false, accent: "#2d7a4a", color: "Vert jade",       color2: "Vert forêt",    grip: "Wavy",                wheel: "Acier vert clair",        defaultLed: null,  bodyHex: "#2d7a4a", clicHex: "#1a4a2a", wheelHex: "#4a9a6a", bodyMetal: 0.2,  bodyRough: 0.6,  gripMetal: 0.0,  gripRough: 0.8,  wheelMetal: 0.75, wheelRough: 0.3  },
+  obsidian: { name: "Obsidian Black",    glb: "GamingMouse_Black-v1.glb", useOriginal: true,  accent: "#444444", color: "Noir obsidienne", color2: "Anthracite",    grip: "Stripe wavy",         wheel: "Métal brossé anthracite", defaultLed: "white", bodyHex: "#0a0a0a", clicHex: "#2a2a2a", wheelHex: "#3a3a3a", bodyMetal: 0.0,  bodyRough: 1.25, gripMetal: 0.0,  gripRough: 2.0,  wheelMetal: 1.0,  wheelRough: 1.0  },
+  tropical: { name: "Tropical Sunrise",  glb: "GM_Green-v1.glb",          useOriginal: false, accent: "#e05a8a", color: "Rose & Jaune",    color2: "Jaune soleil",  grip: "Lignes épaisses",     wheel: "Acier bleu",              defaultLed: null,  bodyHex: "#e05a8a", clicHex: "#f0c040", wheelHex: "#4a6ab5", bodyMetal: 0.1,  bodyRough: 0.55, gripMetal: 0.0,  gripRough: 0.65, wheelMetal: 0.8,  wheelRough: 0.25 },
+};
+
+const LEDS = {
+  off:   { name: "Aucun",      color: new THREE.Color(0,0,0) },
+  white: { name: "Blanc",      color: new THREE.Color(1,1,1) },
+  blue:  { name: "Bleu clair", color: new THREE.Color(0.2,0.6,1) },
+  green: { name: "Vert clair", color: new THREE.Color(0.2,1,0.4) },
+};
+
+let activeModel = "obsidian";
+let activeLed = "white";
+let currentModel = null;
+let autoRotate = true;
+
+// Three.js setup
+const viewer = document.getElementById("viewer");
+const W = () => viewer.clientWidth;
+const H = () => viewer.clientHeight;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(W(), H());
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+renderer.outputEncoding = THREE.sRGBEncoding;
+viewer.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xe8e8e8);
+
+const camera = new THREE.PerspectiveCamera(45, W()/H(), 0.01, 100);
+camera.position.set(0, 0.15, 0.8);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance = 0.3;
+controls.maxDistance = 2;
+controls.target.set(0, 0.05, 0);
+controls.addEventListener("start", () => autoRotate = false);
+
+// Lights
+const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambient);
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+keyLight.position.set(2, 3, 2);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.near = 0.1;
+keyLight.shadow.camera.far = 20;
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0xffffff, 0.6);
+fillLight.position.set(-2, 2, -1);
+scene.add(fillLight);
+
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.4);
+rimLight.position.set(0, 1, -3);
+scene.add(rimLight);
+
+// Mirror floor
+const mirrorGeometry = new THREE.PlaneGeometry(4, 4);
+const mirror = new THREE.Reflector(mirrorGeometry, {
+  clipBias: 0.003,
+  textureWidth: 1024,
+  textureHeight: 1024,
+  color: 0xc0c0c0,
+});
+mirror.rotation.x = -Math.PI / 2;
+mirror.position.y = -0.001;
+scene.add(mirror);
+
+// Floor shadow receiver
+const floorGeo = new THREE.PlaneGeometry(4, 4);
+const floorMat = new THREE.ShadowMaterial({ opacity: 0.15 });
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+// GLTF Loader
+const loader = new THREE.GLTFLoader();
+
+function loadModel(key) {
+  const m = MODELS[key];
+  document.getElementById("statusText").textContent = "Chargement...";
+  document.getElementById("loading-overlay").style.display = "flex";
+
+  if (currentModel) {
+    scene.remove(currentModel);
+    currentModel = null;
+  }
+
+  loader.load(BASE_URL + m.glb, gltf => {
+    currentModel = gltf.scene;
+
+    // Centrer et mettre à l'échelle
+    const box = new THREE.Box3().setFromObject(currentModel);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 0.4 / maxDim;
+    currentModel.scale.setScalar(scale);
+    currentModel.position.sub(center.multiplyScalar(scale));
+    currentModel.position.y += size.y * scale / 2;
+
+    currentModel.traverse(child => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+
+    scene.add(currentModel);
+    applyMaterials();
+    applyLED();
+
+    document.getElementById("loading-overlay").style.display = "none";
+    document.getElementById("statusText").textContent = "Modèle chargé ✓";
+  }, undefined, err => {
+    document.getElementById("statusText").textContent = "Erreur de chargement";
+    console.error(err);
+  });
+}
+
+function applyMaterials() {
+  if (!currentModel) return;
+  const m = MODELS[activeModel];
+  currentModel.traverse(child => {
+    if (!child.isMesh || !child.material) return;
+    const mat = child.material;
+    const n = mat.name || "";
+    if (m.useOriginal) {
+      if (n.includes("base_SG")) {
+        mat.metalness = 0.0; mat.roughness = 1.25;
+      } else if (n.includes("button_SG")) {
+        mat.metalness = 0.0; mat.roughness = 2.0;
+      } else if (n.includes("clic_SG")) {
+        mat.metalness = 0.0; mat.roughness = 1.4;
+      }
+    } else {
+      if (n.includes("base_SG")) {
+        mat.color.set(m.bodyHex); mat.metalness = m.bodyMetal; mat.roughness = m.bodyRough;
+      } else if (n.includes("clic_SG")) {
+        mat.color.set(m.clicHex); mat.metalness = 0.1; mat.roughness = 0.6;
+      } else if (n.includes("button_SG")) {
+        mat.color.set(m.bodyHex); mat.metalness = m.gripMetal; mat.roughness = m.gripRough;
+      } else if (n.includes("bottom_SG")) {
+        mat.color.set(m.clicHex); mat.metalness = 0.05; mat.roughness = 0.9;
+      } else if (n.includes("wheel_SG")) {
+        mat.color.set(m.wheelHex); mat.metalness = m.wheelMetal; mat.roughness = m.wheelRough;
+      }
+    }
+    mat.needsUpdate = true;
+  });
+}
+
+function applyLED() {
+  if (!currentModel) return;
+  const ledColor = LEDS[activeLed].color;
+  currentModel.traverse(child => {
+    if (!child.isMesh || !child.material) return;
+    const n = (child.material.name || "");
+    if (n.includes("base_SG")) {
+      child.material.emissive = ledColor;
+      child.material.emissiveIntensity = activeLed === "off" ? 0 : 0.4;
+      child.material.needsUpdate = true;
+    }
+  });
+}
+
+// Animation loop
+let angle = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  if (autoRotate && currentModel) {
+    angle += 0.005;
+    currentModel.rotation.y = angle;
+  }
+  renderer.render(scene, camera);
+}
+animate();
+
+// Resize
+window.addEventListener("resize", () => {
+  camera.aspect = W() / H();
+  camera.updateProjectionMatrix();
+  renderer.setSize(W(), H());
+});
+
+// UI
+function buildModelTabs() {
+  const wrap = document.getElementById("modelTabs");
+  wrap.innerHTML = "";
+  Object.entries(MODELS).forEach(([key, m]) => {
+    const btn = document.createElement("button");
+    btn.className = "model-tab" + (key === activeModel ? " active" : "");
+    btn.style.borderColor = key === activeModel ? m.accent : "";
+    btn.style.color = key === activeModel ? m.accent : "";
+    btn.textContent = m.name;
+    btn.onclick = () => selectModel(key);
+    wrap.appendChild(btn);
+  });
+}
+
+function buildLedBtns() {
+  const wrap = document.getElementById("ledBtns");
+  wrap.innerHTML = "";
+  Object.entries(LEDS).forEach(([key, l]) => {
+    const btn = document.createElement("button");
+    btn.className = "finish-btn" + (key === activeLed ? " active" : "");
+    btn.textContent = l.name;
+    btn.onclick = () => selectLed(key);
+    wrap.appendChild(btn);
+  });
+}
+
+function selectModel(key) {
+  activeModel = key;
+  const m = MODELS[key];
+  if (m.defaultLed) { activeLed = m.defaultLed; buildLedBtns(); }
+  buildModelTabs();
+  updateInfoPanel();
+  loadModel(key);
+}
+
+function selectLed(key) {
+  activeLed = key;
+  buildLedBtns();
+  updateSummary();
+  applyLED();
+}
+
+function updateInfoPanel() {
+  const m = MODELS[activeModel];
+  document.getElementById("infoColor").textContent = m.color;
+  document.getElementById("infoColor2").textContent = m.color2;
+  document.getElementById("infoGrip").textContent = m.grip;
+  document.getElementById("infoWheel").textContent = m.wheel;
+  document.getElementById("accentBar").style.background = m.accent;
+  updateSummary();
+}
+
+function updateSummary() {
+  const m = MODELS[activeModel];
+  document.getElementById("s-model").textContent = m.name;
+  document.getElementById("s-color").textContent = m.color;
+  document.getElementById("s-grip").textContent = m.grip;
+  document.getElementById("s-wheel").textContent = m.wheel;
+  document.getElementById("s-led").textContent = LEDS[activeLed].name;
+}
+
+document.getElementById("ctaBtn").addEventListener("click", () => {
+  const m = MODELS[activeModel];
+  alert("Votre configuration :\n\nModèle : " + m.name + "\nCouleur : " + m.color + "\nGrip : " + m.grip + "\nMolette : " + m.wheel + "\nLED : " + LEDS[activeLed].name);
+});
+
+// Init
+const defaultModel = MODELS[activeModel];
+if (defaultModel.defaultLed) activeLed = defaultModel.defaultLed;
+buildModelTabs();
+buildLedBtns();
+updateInfoPanel();
+loadModel(activeModel);
+</script>
+</body>
+</html>
