@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurateur Souris Gaming</title>
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #f5f5f3; color: #1a1a1a; height: 100vh; display: flex; flex-direction: column; }
+header { padding: 12px 20px; border-bottom: 0.5px solid #ddd; background: #fff; display: flex; align-items: center; justify-content: space-between; }
+header h1 { font-size: 14px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+.status { font-size: 11px; color: #888; }
+.main { display: grid; grid-template-columns: 1fr 300px; flex: 1; overflow: hidden; }
+.viewer { background: linear-gradient(to bottom, #e8e8e8 60%, #d0d0d0 100%); display: flex; align-items: center; justify-content: center; position: relative; }
+.viewer::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: linear-gradient(to bottom, rgba(232,232,232,0) 0%, rgba(220,220,220,0.6) 100%); pointer-events: none; }
+model-viewer { width: 100%; height: 100%; --poster-color: #1a1a1a; }
+.panel { background: #fff; border-left: 0.5px solid #e0e0e0; overflow-y: auto; display: flex; flex-direction: column; }
+.section { padding: 16px; border-bottom: 0.5px solid #f0f0f0; }
+.section-label { font-size: 10px; font-weight: 500; color: #999; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.accent-bar { height: 3px; border-radius: 2px; margin-bottom: 10px; transition: background 0.3s; }
+.model-tabs { display: flex; flex-direction: column; gap: 5px; }
+.model-tab { padding: 7px 12px; font-size: 12px; border: 0.5px solid #ddd; border-radius: 6px; background: transparent; color: #666; cursor: pointer; text-align: left; transition: all 0.15s; }
+.model-tab:hover { background: #f5f5f3; }
+.model-tab.active { background: #f9f9f7; font-weight: 500; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 0.5px solid #f0f0f0; }
+.info-label { font-size: 11px; color: #999; }
+.info-val { font-size: 12px; font-weight: 500; color: #1a1a1a; text-align: right; max-width: 160px; }
+.finish-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+.finish-btn { padding: 5px 10px; font-size: 11px; border: 0.5px solid #ddd; border-radius: 6px; background: transparent; color: #666; cursor: pointer; transition: all 0.15s; }
+.finish-btn:hover { background: #f5f5f3; }
+.finish-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.summary { padding: 14px 16px; background: #f9f9f7; border-top: 0.5px solid #eee; }
+.sum-row { display: flex; justify-content: space-between; font-size: 11px; color: #888; padding: 3px 0; }
+.sum-val { color: #1a1a1a; font-weight: 500; }
+.cta-wrap { padding: 14px 16px; }
+.cta { width: 100%; padding: 10px; font-size: 13px; font-weight: 500; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+.cta:hover { opacity: 0.8; }
+.hint { font-size: 10px; color: #aaa; text-align: center; margin-top: 6px; }
+@media (max-width: 600px) {
+  .main { grid-template-columns: 1fr; grid-template-rows: 50vh 1fr; }
+  .viewer { min-height: 50vh; }
+  .panel { border-left: none; border-top: 0.5px solid #e0e0e0; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Gaming Mouse — Configurateur</h1>
+  <span class="status" id="statusText">Chargement...</span>
+</header>
+
+<div class="main">
+  <div class="viewer">
+    <model-viewer
+      id="mv"
+      src="https://agentjrf.github.io/Gaming_Mouse/GamingMouse_Black-v1.glb"
+      alt="Gaming Mouse"
+      auto-rotate
+      auto-rotate-delay="0"
+      rotation-per-second="12deg"
+      camera-controls
+      interaction-prompt="none"
+      interpolation-decay="50"
+      shadow-intensity="1"
+      shadow-softness="0.5"
+      exposure="1.2"
+      environment-image="neutral"
+      pixel-ratio="2"
+      style="width:100%;height:100%;background:#e8e8e8;"
+    ></model-viewer>
+  </div>
+
+  <div class="panel">
+    <div class="section">
+      <div class="section-label">Modèle</div>
+      <div class="accent-bar" id="accentBar"></div>
+      <div class="model-tabs" id="modelTabs"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Finitions incluses</div>
+      <div class="info-row"><span class="info-label">Couleur principale</span><span class="info-val" id="infoColor">—</span></div>
+      <div class="info-row"><span class="info-label">Couleur secondaire</span><span class="info-val" id="infoColor2">—</span></div>
+      <div class="info-row"><span class="info-label">Grip</span><span class="info-val" id="infoGrip">—</span></div>
+      <div class="info-row"><span class="info-label">Molette</span><span class="info-val" id="infoWheel">—</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Rétroéclairage LED</div>
+      <div class="finish-btns" id="ledBtns"></div>
+    </div>
+
+    <div class="summary">
+      <div class="sum-row"><span>Modèle</span><span class="sum-val" id="s-model">—</span></div>
+      <div class="sum-row"><span>Couleur</span><span class="sum-val" id="s-color">—</span></div>
+      <div class="sum-row"><span>Grip</span><span class="sum-val" id="s-grip">—</span></div>
+      <div class="sum-row"><span>Molette</span><span class="sum-val" id="s-wheel">—</span></div>
+      <div class="sum-row"><span>LED</span><span class="sum-val" id="s-led">—</span></div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta" id="ctaBtn">Valider ma configuration</button>
+      <p class="hint">← Glisser pour faire tourner le modèle</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE_URL = "https://agentjrf.github.io/Gaming_Mouse/";
+
+const MODELS = {
+  arctic:   { name: "Arctic Blue",       glb: "GM_Green-v1.glb",           useOriginal: false, accent: "#2a6db5", color: "Bleu métallique",  color2: "Bleu glacier",   grip: "Perforé croix",       wheel: "Métal bleu",             bodyMetal: 0.6,  bodyRough: 0.3,  gripMetal: 0.15, gripRough: 0.6,  wheelHex: "#1a4a8a", wheelMetal: 0.85, wheelRough: 0.2,  clicHex: "#a8d4f5" },
+  retro:    { name: "Retro Tech White",   glb: "GM_Green-v1.glb",           useOriginal: false, accent: "#e07b2a", color: "Blanc & Orange",   color2: "Gris Tech",      grip: "Pattern topologique", wheel: "Métal orange",           bodyMetal: 0.05, bodyRough: 0.7,  gripMetal: 0.0,  gripRough: 0.75, wheelHex: "#c45c1a", wheelMetal: 0.8,  wheelRough: 0.25, clicHex: "#9a9a9a" },
+  jungle:   { name: "Jungle Green",       glb: "GM_Green-v1.glb",           useOriginal: false, accent: "#2d7a4a", color: "Vert jade",        color2: "Vert forêt",     grip: "Wavy",                wheel: "Acier vert clair",       bodyMetal: 0.2,  bodyRough: 0.6,  gripMetal: 0.0,  gripRough: 0.8,  wheelHex: "#4a9a6a", wheelMetal: 0.75, wheelRough: 0.3,  clicHex: "#1a4a2a" },
+  obsidian: { name: "Obsidian Black", glb: "GamingMouse_Black-v1.glb", useOriginal: true, accent: "#444444", color: "Noir obsidienne", color2: "Anthracite", grip: "Stripe wavy", wheel: "Métal brossé anthracite", defaultLed: "white" },
+  tropical: { name: "Tropical Sunrise",   glb: "GM_Green-v1.glb",           useOriginal: false, accent: "#e05a8a", color: "Rose & Jaune",     color2: "Jaune soleil",   grip: "Lignes épaisses",     wheel: "Acier bleu",             bodyMetal: 0.1,  bodyRough: 0.55, gripMetal: 0.0,  gripRough: 0.65, wheelHex: "#4a6ab5", wheelMetal: 0.8,  wheelRough: 0.25, clicHex: "#f0c040" },
+};
+
+const BODY_COLORS = { arctic: "#2a6db5", retro: "#f0ede8", jungle: "#2d7a4a", obsidian: "#0a0a0a", tropical: "#e05a8a" };
+
+const LEDS = {
+  off:   { name: "Aucun",      color: [0,0,0] },
+  white: { name: "Blanc",      color: [1,1,1] },
+  blue:  { name: "Bleu clair", color: [0.2,0.6,1] },
+  green: { name: "Vert clair", color: [0.2,1,0.4] },
+};
+
+let activeModel = "obsidian";
+let activeLed = "off";
+let autoRotateStopped = false;
+
+function hexToLinear(hex) {
+  const r = parseInt(hex.slice(1,3),16)/255;
+  const g = parseInt(hex.slice(3,5),16)/255;
+  const b = parseInt(hex.slice(5,7),16)/255;
+  const toL = c => c <= 0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
+  return [toL(r), toL(g), toL(b), 1];
+}
+
+function buildModelTabs() {
+  const wrap = document.getElementById("modelTabs");
+  wrap.innerHTML = "";
+  Object.entries(MODELS).forEach(([key, m]) => {
+    const btn = document.createElement("button");
+    btn.className = "model-tab" + (key === activeModel ? " active" : "");
+    btn.style.borderColor = key === activeModel ? m.accent : "";
+    btn.style.color = key === activeModel ? m.accent : "";
+    btn.textContent = m.name;
+    btn.onclick = () => selectModel(key);
+    wrap.appendChild(btn);
+  });
+}
+
+function buildLedBtns() {
+  const wrap = document.getElementById("ledBtns");
+  wrap.innerHTML = "";
+  Object.entries(LEDS).forEach(([key, l]) => {
+    const btn = document.createElement("button");
+    btn.className = "finish-btn" + (key === activeLed ? " active" : "");
+    btn.textContent = l.name;
+    btn.onclick = () => selectLed(key);
+    wrap.appendChild(btn);
+  });
+}
+
+function selectModel(key) {
+  activeModel = key;
+  const m = MODELS[key];
+  if (m.defaultLed) {
+    activeLed = m.defaultLed;
+    buildLedBtns();
+    updateSummary();
+  }
+  const mv = document.getElementById("mv");
+  const newSrc = BASE_URL + m.glb;
+  buildModelTabs();
+  updateInfoPanel();
+  if (mv.getAttribute("src") !== newSrc) {
+    mv.setAttribute("src", newSrc);
+    mv.addEventListener("load", () => { applyMaterials(); applyLED(); }, { once: true });
+  } else {
+    applyMaterials();
+    applyLED();
+  }
+}
+
+function selectLed(key) {
+  activeLed = key;
+  buildLedBtns();
+  updateSummary();
+  applyLED();
+}
+
+function updateInfoPanel() {
+  const m = MODELS[activeModel];
+  document.getElementById("infoColor").textContent = m.color;
+  document.getElementById("infoColor2").textContent = m.color2;
+  document.getElementById("infoGrip").textContent = m.grip;
+  document.getElementById("infoWheel").textContent = m.wheel;
+  document.getElementById("accentBar").style.background = m.accent;
+  updateSummary();
+}
+
+function updateSummary() {
+  const m = MODELS[activeModel];
+  document.getElementById("s-model").textContent = m.name;
+  document.getElementById("s-color").textContent = m.color;
+  document.getElementById("s-grip").textContent = m.grip;
+  document.getElementById("s-wheel").textContent = m.wheel;
+  document.getElementById("s-led").textContent = LEDS[activeLed].name;
+}
+
+function applyMaterials() {
+  const mv = document.getElementById("mv");
+  if (!mv.model) return;
+  const m = MODELS[activeModel];
+  mv.model.materials.forEach(mat => {
+    const pbr = mat.pbrMetallicRoughness;
+    const n = mat.name;
+    if (m.useOriginal) {
+      // Ne rien modifier — laisser les textures du GLB intactes
+      applyLED();
+      return;
+    } else {
+      if (n.includes("base_SG")) {
+        pbr.setBaseColorFactor(hexToLinear(BODY_COLORS[activeModel]));
+        pbr.setMetallicFactor(m.bodyMetal);
+        pbr.setRoughnessFactor(m.bodyRough);
+      } else if (n.includes("clic_SG")) {
+        pbr.setBaseColorFactor(hexToLinear(m.clicHex));
+        pbr.setMetallicFactor(0.1);
+        pbr.setRoughnessFactor(0.6);
+      } else if (n.includes("button_SG")) {
+        pbr.setBaseColorFactor(hexToLinear(BODY_COLORS[activeModel]));
+        pbr.setMetallicFactor(m.gripMetal);
+        pbr.setRoughnessFactor(m.gripRough);
+      } else if (n.includes("bottom_SG")) {
+        pbr.setBaseColorFactor(hexToLinear(m.clicHex));
+        pbr.setMetallicFactor(0.05);
+        pbr.setRoughnessFactor(0.9);
+      } else if (n.includes("wheel_SG")) {
+        pbr.setBaseColorFactor(hexToLinear(m.wheelHex));
+        pbr.setMetallicFactor(m.wheelMetal);
+        pbr.setRoughnessFactor(m.wheelRough);
+      }
+    }
+  });
+  applyLED();
+}
+
+function applyLED() {
+  const mv = document.getElementById("mv");
+  if (!mv.model) return;
+  const m = MODELS[activeModel];
+  if (m.useOriginal && activeLed === "off") return;
+  mv.model.materials.forEach(mat => {
+    if (mat.name.includes("base_SG")) {
+      mat.setEmissiveFactor(LEDS[activeLed].color);
+    }
+  });
+}
+
+const mv = document.getElementById("mv");
+mv.addEventListener("load", () => {
+  document.getElementById("statusText").textContent = "Modèle chargé ✓";
+  const m = MODELS[activeModel];
+  if (!m.useOriginal) {
+    setTimeout(() => { applyMaterials(); applyLED(); }, 100);
+  } else if (activeLed !== "off") {
+    setTimeout(() => applyLED(), 500);
+  }
+});
+mv.addEventListener("error", () => {
+  document.getElementById("statusText").textContent = "Erreur de chargement";
+});
+mv.addEventListener("camera-change", e => {
+  if (e.detail.source === "user-interaction" && !autoRotateStopped) {
+    autoRotateStopped = true;
+    mv.removeAttribute("auto-rotate");
+  }
+});
+
+document.getElementById("ctaBtn").addEventListener("click", () => {
+  const m = MODELS[activeModel];
+  alert("Votre configuration :\n\nModèle : " + m.name + "\nCouleur : " + m.color + "\nGrip : " + m.grip + "\nMolette : " + m.wheel + "\nLED : " + LEDS[activeLed].name);
+});
+
+const defaultModel = MODELS[activeModel];
+if (defaultModel.defaultLed) activeLed = defaultModel.defaultLed;
+buildModelTabs();
+buildLedBtns();
+updateInfoPanel();
+</script>
+</body>
+</html>
