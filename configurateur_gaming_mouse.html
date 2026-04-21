@@ -217,13 +217,46 @@ function applyMaterials() {
   const mv = document.getElementById("mv");
   if (!mv.model) return;
   const m = MODELS[activeModel];
+  if (m.useOriginal) return;
   mv.model.materials.forEach(mat => {
     const pbr = mat.pbrMetallicRoughness;
     const n = mat.name;
-    if (m.useOriginal) {
-      // Ne rien modifier — laisser les textures du GLB intactes
-      applyLED();
-      return;
+    if (n.includes("base_SG")) {
+      pbr.setBaseColorFactor(hexToLinear(BODY_COLORS[activeModel]));
+      pbr.setMetallicFactor(m.bodyMetal);
+      pbr.setRoughnessFactor(m.bodyRough);
+    } else if (n.includes("clic_SG")) {
+      pbr.setBaseColorFactor(hexToLinear(m.clicHex));
+      pbr.setMetallicFactor(0.1);
+      pbr.setRoughnessFactor(0.6);
+    } else if (n.includes("button_SG")) {
+      pbr.setBaseColorFactor(hexToLinear(BODY_COLORS[activeModel]));
+      pbr.setMetallicFactor(m.gripMetal);
+      pbr.setRoughnessFactor(m.gripRough);
+    } else if (n.includes("bottom_SG")) {
+      pbr.setBaseColorFactor(hexToLinear(m.clicHex));
+      pbr.setMetallicFactor(0.05);
+      pbr.setRoughnessFactor(0.9);
+    } else if (n.includes("wheel_SG")) {
+      pbr.setBaseColorFactor(hexToLinear(m.wheelHex));
+      pbr.setMetallicFactor(m.wheelMetal);
+      pbr.setRoughnessFactor(m.wheelRough);
+    }
+  });
+  applyLED();
+}
+
+function applyLED() {
+  const mv = document.getElementById("mv");
+  if (!mv.model) return;
+  const m = MODELS[activeModel];
+  if (m.useOriginal && activeLed === "off") return;
+  mv.model.materials.forEach(mat => {
+    if (mat.name.includes("base_SG")) {
+      mat.setEmissiveFactor(LEDS[activeLed].color);
+    }
+  });
+}
     } else {
       if (n.includes("base_SG")) {
         pbr.setBaseColorFactor(hexToLinear(BODY_COLORS[activeModel]));
