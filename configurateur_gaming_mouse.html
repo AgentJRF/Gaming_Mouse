@@ -12,9 +12,8 @@ header { padding: 12px 20px; border-bottom: 0.5px solid #ddd; background: #fff; 
 header h1 { font-size: 14px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
 .status { font-size: 11px; color: #888; }
 .main { display: grid; grid-template-columns: 1fr 300px; flex: 1; overflow: hidden; }
-.viewer { background: linear-gradient(to bottom, #e8e8e8 60%, #d0d0d0 100%); display: flex; align-items: center; justify-content: center; position: relative; }
-.viewer::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: linear-gradient(to bottom, rgba(232,232,232,0) 0%, rgba(220,220,220,0.6) 100%); pointer-events: none; }
-model-viewer { width: 100%; height: 100%; --poster-color: #1a1a1a; }
+.viewer { background: #e8e8e8; display: flex; align-items: center; justify-content: center; position: relative; }
+model-viewer { width: 100%; height: 100%; --poster-color: #e8e8e8; }
 .panel { background: #fff; border-left: 0.5px solid #e0e0e0; overflow-y: auto; display: flex; flex-direction: column; }
 .section { padding: 16px; border-bottom: 0.5px solid #f0f0f0; }
 .section-label { font-size: 10px; font-weight: 500; color: #999; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
@@ -37,11 +36,6 @@ model-viewer { width: 100%; height: 100%; --poster-color: #1a1a1a; }
 .cta { width: 100%; padding: 10px; font-size: 13px; font-weight: 500; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
 .cta:hover { opacity: 0.8; }
 .hint { font-size: 10px; color: #aaa; text-align: center; margin-top: 6px; }
-@media (max-width: 600px) {
-  .main { grid-template-columns: 1fr; grid-template-rows: 50vh 1fr; }
-  .viewer { min-height: 50vh; }
-  .panel { border-left: none; border-top: 0.5px solid #e0e0e0; }
-}
 </style>
 </head>
 <body>
@@ -55,7 +49,6 @@ model-viewer { width: 100%; height: 100%; --poster-color: #1a1a1a; }
   <div class="viewer">
     <model-viewer
       id="mv"
-      src="https://agentjrf.github.io/Gaming_Mouse/GamingMouse_Black-v1.glb"
       alt="Gaming Mouse"
       auto-rotate
       auto-rotate-delay="0"
@@ -79,7 +72,6 @@ model-viewer { width: 100%; height: 100%; --poster-color: #1a1a1a; }
       <div class="accent-bar" id="accentBar"></div>
       <div class="model-tabs" id="modelTabs"></div>
     </div>
-
     <div class="section">
       <div class="section-label">Finitions incluses</div>
       <div class="info-row"><span class="info-label">Couleur principale</span><span class="info-val" id="infoColor">—</span></div>
@@ -87,12 +79,10 @@ model-viewer { width: 100%; height: 100%; --poster-color: #1a1a1a; }
       <div class="info-row"><span class="info-label">Grip</span><span class="info-val" id="infoGrip">—</span></div>
       <div class="info-row"><span class="info-label">Molette</span><span class="info-val" id="infoWheel">—</span></div>
     </div>
-
     <div class="section">
       <div class="section-label">Rétroéclairage LED</div>
       <div class="finish-btns" id="ledBtns"></div>
     </div>
-
     <div class="summary">
       <div class="sum-row"><span>Modèle</span><span class="sum-val" id="s-model">—</span></div>
       <div class="sum-row"><span>Couleur</span><span class="sum-val" id="s-color">—</span></div>
@@ -100,7 +90,6 @@ model-viewer { width: 100%; height: 100%; --poster-color: #1a1a1a; }
       <div class="sum-row"><span>Molette</span><span class="sum-val" id="s-wheel">—</span></div>
       <div class="sum-row"><span>LED</span><span class="sum-val" id="s-led">—</span></div>
     </div>
-
     <div class="cta-wrap">
       <button class="cta" id="ctaBtn">Valider ma configuration</button>
       <p class="hint">← Glisser pour faire tourner le modèle</p>
@@ -112,20 +101,18 @@ model-viewer { width: 100%; height: 100%; --poster-color: #1a1a1a; }
 const BASE_URL = "https://agentjrf.github.io/Gaming_Mouse/";
 
 const MODELS = {
-  arctic:   { name: "Arctic Blue",       glb: "GM_Green-v1.glb",           useOriginal: false, accent: "#2a6db5", color: "Bleu métallique",  color2: "Bleu glacier",   grip: "Perforé croix",       wheel: "Métal bleu",             bodyMetal: 0.6,  bodyRough: 0.3,  gripMetal: 0.15, gripRough: 0.6,  wheelHex: "#1a4a8a", wheelMetal: 0.85, wheelRough: 0.2,  clicHex: "#a8d4f5" },
-  retro:    { name: "Retro Tech White",   glb: "GM_Green-v1.glb",           useOriginal: false, accent: "#e07b2a", color: "Blanc & Orange",   color2: "Gris Tech",      grip: "Pattern topologique", wheel: "Métal orange",           bodyMetal: 0.05, bodyRough: 0.7,  gripMetal: 0.0,  gripRough: 0.75, wheelHex: "#c45c1a", wheelMetal: 0.8,  wheelRough: 0.25, clicHex: "#9a9a9a" },
-  jungle:   { name: "Jungle Green",       glb: "GM_Green-v1.glb",           useOriginal: false, accent: "#2d7a4a", color: "Vert jade",        color2: "Vert forêt",     grip: "Wavy",                wheel: "Acier vert clair",       bodyMetal: 0.2,  bodyRough: 0.6,  gripMetal: 0.0,  gripRough: 0.8,  wheelHex: "#4a9a6a", wheelMetal: 0.75, wheelRough: 0.3,  clicHex: "#1a4a2a" },
-  obsidian: { name: "Obsidian Black", glb: "GamingMouse_Black-v1.glb", useOriginal: true, accent: "#444444", color: "Noir obsidienne", color2: "Anthracite", grip: "Stripe wavy", wheel: "Métal brossé anthracite", defaultLed: "white" },
-  tropical: { name: "Tropical Sunrise",   glb: "GM_Green-v1.glb",           useOriginal: false, accent: "#e05a8a", color: "Rose & Jaune",     color2: "Jaune soleil",   grip: "Lignes épaisses",     wheel: "Acier bleu",             bodyMetal: 0.1,  bodyRough: 0.55, gripMetal: 0.0,  gripRough: 0.65, wheelHex: "#4a6ab5", wheelMetal: 0.8,  wheelRough: 0.25, clicHex: "#f0c040" },
+  arctic:   { name: "Arctic Blue",      glb: "GM_Green-v1.glb",          useOriginal: true,  defaultLed: null,    accent: "#2a6db5", color: "Bleu métallique", color2: "Bleu glacier",  grip: "Perforé croix",       wheel: "Métal bleu",              bodyHex: "#2a6db5", clicHex: "#a8d4f5", wheelHex: "#1a4a8a", bodyMetal: 0.6,  bodyRough: 0.3,  gripMetal: 0.15, gripRough: 0.6,  wheelMetal: 0.85, wheelRough: 0.2  },
+  retro:    { name: "Retro Tech White",  glb: "GM_Green-v1.glb",          useOriginal: true,  defaultLed: null,    accent: "#e07b2a", color: "Blanc & Orange",  color2: "Gris Tech",     grip: "Pattern topologique", wheel: "Métal orange",            bodyHex: "#f0ede8", clicHex: "#9a9a9a", wheelHex: "#c45c1a", bodyMetal: 0.05, bodyRough: 0.7,  gripMetal: 0.0,  gripRough: 0.75, wheelMetal: 0.8,  wheelRough: 0.25 },
+  jungle:   { name: "Jungle Green",      glb: "GM_Green-v4.glb",          useOriginal: true,  defaultLed: null,    accent: "#2d7a4a", color: "Vert jade",       color2: "Vert forêt",    grip: "Wavy",                wheel: "Acier vert clair",        bodyHex: "#2d7a4a", clicHex: "#1a4a2a", wheelHex: "#4a9a6a", bodyMetal: 0.2,  bodyRough: 0.6,  gripMetal: 0.0,  gripRough: 0.8,  wheelMetal: 0.75, wheelRough: 0.3  },
+  obsidian: { name: "Obsidian Black",    glb: "GamingMouse_Black-v1.glb", useOriginal: true,  defaultLed: "white", accent: "#444444", color: "Noir obsidienne", color2: "Anthracite",    grip: "Stripe wavy",         wheel: "Métal brossé anthracite", bodyHex: "#0a0a0a", clicHex: "#2a2a2a", wheelHex: "#3a3a3a", bodyMetal: 0.0,  bodyRough: 1.25, gripMetal: 0.0,  gripRough: 2.0,  wheelMetal: 1.0,  wheelRough: 1.0  },
+  tropical: { name: "Tropical Sunrise",  glb: "GM_Green-v1.glb",          useOriginal: true,  defaultLed: null,    accent: "#e05a8a", color: "Rose & Jaune",    color2: "Jaune soleil",  grip: "Lignes épaisses",     wheel: "Acier bleu",              bodyHex: "#e05a8a", clicHex: "#f0c040", wheelHex: "#4a6ab5", bodyMetal: 0.1,  bodyRough: 0.55, gripMetal: 0.0,  gripRough: 0.65, wheelMetal: 0.8,  wheelRough: 0.25 },
 };
 
-const BODY_COLORS = { arctic: "#2a6db5", retro: "#f0ede8", jungle: "#2d7a4a", obsidian: "#0a0a0a", tropical: "#e05a8a" };
-
 const LEDS = {
-  off:   { name: "Aucun",      color: [0,0,0] },
-  white: { name: "Blanc",      color: [1,1,1] },
-  blue:  { name: "Bleu clair", color: [0.2,0.6,1] },
-  green: { name: "Vert clair", color: [0.2,1,0.4] },
+  off:   { name: "Aucun",      color: [0, 0, 0] },
+  white: { name: "Blanc",      color: [1, 1, 1] },
+  blue:  { name: "Bleu clair", color: [0.2, 0.6, 1] },
+  green: { name: "Vert clair", color: [0.2, 1, 0.4] },
 };
 
 let activeModel = "jungle";
@@ -139,6 +126,16 @@ function hexToLinear(hex) {
   const toL = c => c <= 0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
   return [toL(r), toL(g), toL(b), 1];
 }
+
+function applyLED() {
+  const mv = document.getElementById("mv");
+  if (!mv.model) return;
+  if (activeLed === "off") return;
+  mv.model.materials.forEach(mat => {
+    if (mat.name.includes("base_SG")) {
+      mat.setEmissiveFactor(LEDS[activeLed].color);
+    }
+  });
 }
 
 function buildModelTabs() {
@@ -175,17 +172,11 @@ function selectModel(key) {
     buildLedBtns();
     updateSummary();
   }
-  const mv = document.getElementById("mv");
-  const newSrc = BASE_URL + m.glb;
   buildModelTabs();
   updateInfoPanel();
-  if (mv.getAttribute("src") !== newSrc) {
-    mv.setAttribute("src", newSrc);
-    mv.addEventListener("load", () => { applyMaterials(); applyLED(); }, { once: true });
-  } else {
-    applyMaterials();
-    applyLED();
-  }
+  const mv = document.getElementById("mv");
+  mv.setAttribute("src", "");
+  setTimeout(() => mv.setAttribute("src", BASE_URL + m.glb), 50);
 }
 
 function selectLed(key) {
@@ -214,98 +205,10 @@ function updateSummary() {
   document.getElementById("s-led").textContent = LEDS[activeLed].name;
 }
 
-function applyMaterials() {
-  const mv = document.getElementById("mv");
-  if (!mv.model) return;
-  const m = MODELS[activeModel];
-  if (m.useOriginal) return;
-  mv.model.materials.forEach(mat => {
-    const pbr = mat.pbrMetallicRoughness;
-    const n = mat.name;
-    if (n.includes("base_SG")) {
-      pbr.setBaseColorFactor(hexToLinear(BODY_COLORS[activeModel]));
-      pbr.setMetallicFactor(m.bodyMetal);
-      pbr.setRoughnessFactor(m.bodyRough);
-    } else if (n.includes("clic_SG")) {
-      pbr.setBaseColorFactor(hexToLinear(m.clicHex));
-      pbr.setMetallicFactor(0.1);
-      pbr.setRoughnessFactor(0.6);
-    } else if (n.includes("button_SG")) {
-      pbr.setBaseColorFactor(hexToLinear(BODY_COLORS[activeModel]));
-      pbr.setMetallicFactor(m.gripMetal);
-      pbr.setRoughnessFactor(m.gripRough);
-    } else if (n.includes("bottom_SG")) {
-      pbr.setBaseColorFactor(hexToLinear(m.clicHex));
-      pbr.setMetallicFactor(0.05);
-      pbr.setRoughnessFactor(0.9);
-    } else if (n.includes("wheel_SG")) {
-      pbr.setBaseColorFactor(hexToLinear(m.wheelHex));
-      pbr.setMetallicFactor(m.wheelMetal);
-      pbr.setRoughnessFactor(m.wheelRough);
-    }
-  });
-  applyLED();
-}
-
-function applyLED() {
-  const mv = document.getElementById("mv");
-  if (!mv.model) return;
-  const m = MODELS[activeModel];
-  if (m.useOriginal && activeLed === "off") return;
-  mv.model.materials.forEach(mat => {
-    if (mat.name.includes("base_SG")) {
-      mat.setEmissiveFactor(LEDS[activeLed].color);
-    }
-  });
-}
-    } else {
-      if (n.includes("base_SG")) {
-        pbr.setBaseColorFactor(hexToLinear(BODY_COLORS[activeModel]));
-        pbr.setMetallicFactor(m.bodyMetal);
-        pbr.setRoughnessFactor(m.bodyRough);
-      } else if (n.includes("clic_SG")) {
-        pbr.setBaseColorFactor(hexToLinear(m.clicHex));
-        pbr.setMetallicFactor(0.1);
-        pbr.setRoughnessFactor(0.6);
-      } else if (n.includes("button_SG")) {
-        pbr.setBaseColorFactor(hexToLinear(BODY_COLORS[activeModel]));
-        pbr.setMetallicFactor(m.gripMetal);
-        pbr.setRoughnessFactor(m.gripRough);
-      } else if (n.includes("bottom_SG")) {
-        pbr.setBaseColorFactor(hexToLinear(m.clicHex));
-        pbr.setMetallicFactor(0.05);
-        pbr.setRoughnessFactor(0.9);
-      } else if (n.includes("wheel_SG")) {
-        pbr.setBaseColorFactor(hexToLinear(m.wheelHex));
-        pbr.setMetallicFactor(m.wheelMetal);
-        pbr.setRoughnessFactor(m.wheelRough);
-      }
-    }
-  });
-  applyLED();
-}
-
-function applyLED() {
-  const mv = document.getElementById("mv");
-  if (!mv.model) return;
-  const m = MODELS[activeModel];
-  if (m.useOriginal && activeLed === "off") return;
-  mv.model.materials.forEach(mat => {
-    if (mat.name.includes("base_SG")) {
-      mat.setEmissiveFactor(LEDS[activeLed].color);
-    }
-  });
-}
-
 const mv = document.getElementById("mv");
 mv.addEventListener("load", () => {
   document.getElementById("statusText").textContent = "Modèle chargé ✓";
-  const m = MODELS[activeModel];
-  if (!m.useOriginal) {
-    setTimeout(() => { applyMaterials(); applyLED(); }, 100);
-  } else if (activeLed !== "off") {
-    setTimeout(() => applyLED(), 500);
-  }
+  if (activeLed !== "off") applyLED();
 });
 mv.addEventListener("error", () => {
   document.getElementById("statusText").textContent = "Erreur de chargement";
@@ -322,11 +225,12 @@ document.getElementById("ctaBtn").addEventListener("click", () => {
   alert("Votre configuration :\n\nModèle : " + m.name + "\nCouleur : " + m.color + "\nGrip : " + m.grip + "\nMolette : " + m.wheel + "\nLED : " + LEDS[activeLed].name);
 });
 
-const defaultModel = MODELS[activeModel];
-if (defaultModel.defaultLed) activeLed = defaultModel.defaultLed;
+const defaultM = MODELS[activeModel];
+if (defaultM.defaultLed) activeLed = defaultM.defaultLed;
 buildModelTabs();
 buildLedBtns();
 updateInfoPanel();
+mv.setAttribute("src", BASE_URL + defaultM.glb);
 </script>
 </body>
 </html>
