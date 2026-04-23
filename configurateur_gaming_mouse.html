@@ -200,6 +200,15 @@ const mv = document.getElementById("mv");
 mv.addEventListener("load", () => {
   document.getElementById("statusText").textContent = "Modèle chargé ✓";
   if (activeLed !== "off") applyLED();
+  if (!mv.model) return;
+  mv.model.materials.forEach(mat => {
+    const pbr = mat.pbrMetallicRoughness;
+    const n = mat.name;
+    if (n.includes("button_SG")) {
+      pbr.setMetallicFactor(0.0);
+      pbr.setRoughnessFactor(3.0);
+    }
+  });
 });
 mv.addEventListener("error", () => {
   document.getElementById("statusText").textContent = "Erreur de chargement";
