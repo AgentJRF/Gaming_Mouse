@@ -208,25 +208,23 @@ function updateSummary() {
 const mv = document.getElementById("mv");
 mv.addEventListener("load", () => {
   document.getElementById("statusText").textContent = "Modèle chargé ✓";
-  if (activeLed !== "off") applyLED();
-  // Ajustements roughness par modèle
-  if (!mv.model) return;
-  mv.model.materials.forEach(mat => {
-    const pbr = mat.pbrMetallicRoughness;
-    const n = mat.name;
-    if (activeModel === "obsidian" || activeModel === "arctic") {
-      if (n.includes("base_SG")) {
-        pbr.setMetallicFactor(0.0);
-        pbr.setRoughnessFactor(activeModel === "arctic" ? 1.25 : 1.25);
-      } else if (n.includes("button_SG")) {
-        pbr.setMetallicFactor(0.0);
-        pbr.setRoughnessFactor(activeModel === "arctic" ? 3.0 : 2.0);
-      } else if (n.includes("clic_SG")) {
-        pbr.setMetallicFactor(0.0);
-        pbr.setRoughnessFactor(activeModel === "arctic" ? 1.4 : 1.4);
+  setTimeout(() => {
+    if (activeLed !== "off") applyLED();
+    if (!mv.model) return;
+    mv.model.materials.forEach(mat => {
+      const pbr = mat.pbrMetallicRoughness;
+      const n = mat.name;
+      if (activeModel === "obsidian") {
+        if (n.includes("base_SG")) { pbr.setMetallicFactor(0.0); pbr.setRoughnessFactor(1.25); }
+        else if (n.includes("button_SG")) { pbr.setMetallicFactor(0.0); pbr.setRoughnessFactor(2.0); }
+        else if (n.includes("clic_SG")) { pbr.setMetallicFactor(0.0); pbr.setRoughnessFactor(1.4); }
+      } else if (activeModel === "arctic") {
+        if (n.includes("base_SG")) { pbr.setMetallicFactor(0.0); pbr.setRoughnessFactor(1.25); }
+        else if (n.includes("button_SG")) { pbr.setMetallicFactor(0.0); pbr.setRoughnessFactor(3.0); }
+        else if (n.includes("clic_SG")) { pbr.setMetallicFactor(0.0); pbr.setRoughnessFactor(1.4); }
       }
-    }
-  });
+    });
+  }, 200);
 });
 mv.addEventListener("error", () => {
   document.getElementById("statusText").textContent = "Erreur de chargement";
