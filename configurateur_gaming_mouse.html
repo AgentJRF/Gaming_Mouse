@@ -209,6 +209,24 @@ const mv = document.getElementById("mv");
 mv.addEventListener("load", () => {
   document.getElementById("statusText").textContent = "Modèle chargé ✓";
   if (activeLed !== "off") applyLED();
+  // Ajustements roughness par modèle
+  if (!mv.model) return;
+  mv.model.materials.forEach(mat => {
+    const pbr = mat.pbrMetallicRoughness;
+    const n = mat.name;
+    if (activeModel === "obsidian" || activeModel === "arctic") {
+      if (n.includes("base_SG")) {
+        pbr.setMetallicFactor(0.0);
+        pbr.setRoughnessFactor(activeModel === "arctic" ? 1.25 : 1.25);
+      } else if (n.includes("button_SG")) {
+        pbr.setMetallicFactor(0.0);
+        pbr.setRoughnessFactor(activeModel === "arctic" ? 2.0 : 2.0);
+      } else if (n.includes("clic_SG")) {
+        pbr.setMetallicFactor(0.0);
+        pbr.setRoughnessFactor(activeModel === "arctic" ? 1.4 : 1.4);
+      }
+    }
+  });
 });
 mv.addEventListener("error", () => {
   document.getElementById("statusText").textContent = "Erreur de chargement";
