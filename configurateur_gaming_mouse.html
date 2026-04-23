@@ -209,12 +209,8 @@ const mv = document.getElementById("mv");
 mv.addEventListener("load", () => {
   document.getElementById("statusText").textContent = "Modèle chargé ✓";
   if (activeLed !== "off") applyLED();
-  applyRoughness();
-});
-
-function applyRoughness() {
-  const mv = document.getElementById("mv");
-  if (mv.model) {
+  setTimeout(() => {
+    if (!mv.model) return;
     mv.model.materials.forEach(mat => {
       const pbr = mat.pbrMetallicRoughness;
       const n = mat.name;
@@ -228,10 +224,8 @@ function applyRoughness() {
         else if (n.includes("clic_SG")) { pbr.setMetallicFactor(0.0); pbr.setRoughnessFactor(1.4); }
       }
     });
-  }
-  requestAnimationFrame(applyRoughness);
-}
-requestAnimationFrame(applyRoughness);
+  }, 1000);
+});
 mv.addEventListener("error", () => {
   document.getElementById("statusText").textContent = "Erreur de chargement";
 });
