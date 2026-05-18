@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Configurateur Souris Gaming</title>
+<title>Gaming Mouse Configurator</title>
 <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -46,8 +46,8 @@ model-viewer { width: 100%; height: 100%; --poster-color: #e8e8e8; }
 <body>
 
 <header>
-  <h1>Gaming Mouse — Configurateur</h1>
-  <span class="status" id="statusText">Chargement...</span>
+  <h1>Gaming Mouse — Configurator</h1>
+  <span class="status" id="statusText">Loading...</span>
 </header>
 
 <div class="main">
@@ -71,34 +71,34 @@ model-viewer { width: 100%; height: 100%; --poster-color: #e8e8e8; }
 
   <div class="panel">
     <div class="section">
-      <div class="section-label">Modèle</div>
+      <div class="section-label">Model</div>
       <div class="accent-bar" id="accentBar"></div>
       <div class="model-tabs" id="modelTabs"></div>
     </div>
     <div class="section">
-      <div class="section-label">Finitions incluses</div>
-      <div class="info-row"><span class="info-label">Couleur principale</span><span class="info-val" id="infoColor">—</span></div>
-      <div class="info-row"><span class="info-label">Couleur secondaire</span><span class="info-val" id="infoColor2">—</span></div>
-      <div class="info-row"><span class="info-label">Molette</span><span class="info-val" id="infoWheel">—</span></div>
+      <div class="section-label">Included Finishes</div>
+      <div class="info-row"><span class="info-label">Main color</span><span class="info-val" id="infoColor">—</span></div>
+      <div class="info-row"><span class="info-label">Secondary color</span><span class="info-val" id="infoColor2">—</span></div>
+      <div class="info-row"><span class="info-label">Scroll wheel</span><span class="info-val" id="infoWheel">—</span></div>
     </div>
     <div class="section">
-      <div class="section-label">Type de grip</div>
+      <div class="section-label">Grip Type</div>
       <div class="grip-list" id="gripBtns"></div>
     </div>
     <div class="section">
-      <div class="section-label">Rétroéclairage LED</div>
+      <div class="section-label">LED Backlight</div>
       <div class="finish-btns" id="ledBtns"></div>
     </div>
     <div class="summary">
-      <div class="sum-row"><span>Modèle</span><span class="sum-val" id="s-model">—</span></div>
-      <div class="sum-row"><span>Couleur</span><span class="sum-val" id="s-color">—</span></div>
+      <div class="sum-row"><span>Model</span><span class="sum-val" id="s-model">—</span></div>
+      <div class="sum-row"><span>Color</span><span class="sum-val" id="s-color">—</span></div>
       <div class="sum-row"><span>Grip</span><span class="sum-val" id="s-grip">—</span></div>
-      <div class="sum-row"><span>Molette</span><span class="sum-val" id="s-wheel">—</span></div>
+      <div class="sum-row"><span>Wheel</span><span class="sum-val" id="s-wheel">—</span></div>
       <div class="sum-row"><span>LED</span><span class="sum-val" id="s-led">—</span></div>
     </div>
     <div class="cta-wrap">
-      <button class="cta" id="ctaBtn">Valider ma configuration</button>
-      <p class="hint">← Glisser pour faire tourner le modèle</p>
+      <button class="cta" id="ctaBtn">Save my configuration ↗</button>
+      <p class="hint">← Drag to rotate the model →</p>
     </div>
   </div>
 </div>
@@ -107,25 +107,25 @@ model-viewer { width: 100%; height: 100%; --poster-color: #e8e8e8; }
 const BASE_URL = "https://agentjrf.github.io/Gaming_Mouse/";
 
 const MODELS = {
-  arctic:   { name: "Arctic Blue",      glb: "GM_Arctic_Blue-v5.glb",                 accent: "#2a6db5", color: "Bleu métallique", color2: "Bleu glacier",  wheel: "Métal bleu",              defaultLed: null    },
-  retro:    { name: "Retro Tech White",  glb: "GM_White-v1.glb",                       accent: "#e07b2a", color: "Blanc & Orange",  color2: "Gris Tech",     wheel: "Métal orange",            defaultLed: null    },
-  jungle:   { name: "Jungle Green",      glb: "GM_Green-v4.glb",                       accent: "#2d7a4a", color: "Vert jade",       color2: "Vert forêt",    wheel: "Acier vert clair",        defaultLed: null    },
-  obsidian: { name: "Obsidian Black",    glb: "GamingMouse_Black-v1.glb",              accent: "#444444", color: "Noir obsidienne", color2: "Anthracite",    wheel: "Métal brossé anthracite", defaultLed: "white" },
-  tropical: { name: "Tropical Sunrise",  glb: "GamingMouse_v04_TequilaSunrise-v4.glb", accent: "#e05a8a", color: "Rose & Jaune",    color2: "Jaune soleil",  wheel: "Acier bleu",              defaultLed: null    },
+  arctic:   { name: "Arctic Blue",      glb: "GM_Arctic_Blue-v5.glb",                 accent: "#2a6db5", color: "Metallic Blue",   color2: "Glacier Blue",  wheel: "Blue Metal",              defaultLed: null    },
+  retro:    { name: "Retro Tech White",  glb: "GM_White-v1.glb",                       accent: "#e07b2a", color: "White & Orange",  color2: "Tech Gray",     wheel: "Orange Metal",            defaultLed: null    },
+  jungle:   { name: "Jungle Green",      glb: "GM_Green-v4.glb",                       accent: "#2d7a4a", color: "Jade Green",      color2: "Forest Green",  wheel: "Light Green Steel",       defaultLed: null    },
+  obsidian: { name: "Obsidian Black",    glb: "GamingMouse_Black-v1.glb",              accent: "#444444", color: "Obsidian Black",  color2: "Anthracite",    wheel: "Brushed Anthracite Metal",defaultLed: "white" },
+  tropical: { name: "Tropical Sunrise",  glb: "GamingMouse_v04_TequilaSunrise-v4.glb", accent: "#e05a8a", color: "Pink & Yellow",   color2: "Sunshine Yellow",wheel: "Blue Steel",             defaultLed: null    },
 };
 
 const GRIPS = {
-  stripe:  { name: "Stripe Wavy",     desc: "Lignes ondulées, prise en main assurée" },
-  wavy:    { name: "Wavy",            desc: "Motif vagues, confort naturel"           },
-  perfore: { name: "Perforé Croix",   desc: "Pattern perforé, léger et respirant"    },
-  lignes:  { name: "Lignes Épaisses", desc: "Rainures profondes, grip maximal"        },
-  topo:    { name: "Topologique",     desc: "Pattern topographique inspiré du terrain"},
+  stripe:  { name: "Stripe Wavy",     desc: "Wavy lines for a secure grip"              },
+  wavy:    { name: "Wavy",            desc: "Wave pattern for natural comfort"           },
+  perfore: { name: "Cross Perforated",desc: "Lightweight perforated cross pattern"       },
+  lignes:  { name: "Thick Lines",     desc: "Deep grooves for maximum grip"              },
+  topo:    { name: "Topographic",     desc: "Terrain-inspired topographic pattern"       },
 };
 
 const LEDS = {
-  white: { name: "Blanc",      color: [1, 1, 1]       },
-  blue:  { name: "Bleu clair", color: [0.2, 0.6, 1]   },
-  green: { name: "Vert clair", color: [0.2, 1, 0.4]   },
+  white: { name: "White",       color: [1, 1, 1]     },
+  blue:  { name: "Light Blue",  color: [0.2, 0.6, 1] },
+  green: { name: "Light Green", color: [0.2, 1, 0.4] },
 };
 
 let activeModel = "obsidian";
@@ -226,11 +226,11 @@ function updateSummary() {
 
 const mv = document.getElementById("mv");
 mv.addEventListener("load", () => {
-  document.getElementById("statusText").textContent = "Modèle chargé ✓";
+  document.getElementById("statusText").textContent = "Model loaded ✓";
   applyLED();
 });
 mv.addEventListener("error", () => {
-  document.getElementById("statusText").textContent = "Erreur de chargement";
+  document.getElementById("statusText").textContent = "Loading error";
 });
 mv.addEventListener("camera-change", e => {
   if (e.detail.source === "user-interaction" && !autoRotateStopped) {
@@ -241,7 +241,7 @@ mv.addEventListener("camera-change", e => {
 
 document.getElementById("ctaBtn").addEventListener("click", () => {
   const m = MODELS[activeModel];
-  alert("Votre configuration :\n\nModèle : " + m.name + "\nGrip : " + GRIPS[activeGrip].name + "\nMolette : " + m.wheel + "\nLED : " + LEDS[activeLed].name);
+  alert("Your configuration:\n\nModel: " + m.name + "\nGrip: " + GRIPS[activeGrip].name + "\nWheel: " + m.wheel + "\nLED: " + LEDS[activeLed].name);
 });
 
 buildModelTabs();
